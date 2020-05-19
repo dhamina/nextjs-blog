@@ -1,63 +1,45 @@
 import Head from 'next/head'
+import GooglePicker from 'react-google-picker';
 
 export default function Home() {
   return (
     <div className="container">
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+       <GooglePicker clientId={'483578504246-pfg5vdptma6pf80v5sokk0kj9h73o3ad.apps.googleusercontent.com'}
+      developerKey={'AIzaSyDS1llxBx5z0uOt8KjLtcjh56QTJFwl3YM'}
+      scope={['https://www.googleapis.com/auth/drive.readonly']}
+      onChange={data => console.log('on change:', data)}
+      onAuthFailed={data => console.log('on auth failed:', data)}
+      multiselect={true}
+      navHidden={true}
+      authImmediate={false}
+      viewId={'DOCS'}
+      mimeTypes={['image/png', 'image/jpeg', 'image/jpg']}
+      createPicker={ (google, oauthToken) => {
+        const googleViewId = google.picker.ViewId.DOCS;
+        const uploadView = new google.picker.DocsUploadView();
+        const docsView = new google.picker.DocsView(googleViewId)
+            .setIncludeFolders(true)
+            .setSelectFolderEnabled(true);
 
-      <main>
-        <h1 className="title">
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className="description">
-          Get started by editing <code>pages/index.js</code>
-        </p>
-
-        <div className="grid">
-          <a href="https://nextjs.org/docs" className="card">
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className="card">
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/zeit/next.js/tree/master/examples"
-            className="card"
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className="card"
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className="logo" />
-        </a>
-      </footer>
+        const picker = new window.google.picker.PickerBuilder()
+        .enableFeature(google.picker.Feature.SIMPLE_UPLOAD_ENABLED)
+          .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+            .addView(docsView)
+            .addView(uploadView)/*DocsUploadView added*/
+            .setOAuthToken(oauthToken)
+            .setDeveloperKey('AIzaSyDS1llxBx5z0uOt8KjLtcjh56QTJFwl3YM')
+            .setCallback((data)=>{
+              if (data.action == google.picker.Action.PICKED) {
+                  var fileId = data.docs[0].id;
+                  alert('The user selected: ' + fileId);
+                  picker();
+              }
+            });
+        picker.build().setVisible(true);
+    }}>
+    <span>Click here</span>
+    <div className="google"></div>
+    </GooglePicker>
 
       <style jsx>{`
         .container {
